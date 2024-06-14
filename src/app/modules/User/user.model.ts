@@ -39,9 +39,16 @@ UserSchema.pre("save", async function (next) {
 UserSchema.statics.isUserExists = async function (email: string) {
   return await User.findOne({ email }).select(
     "+password"
-  ); /** i have selected 0 for not fetchin the password for every find operation, 
+  ).lean(); /** i have selected 0 for not fetchin the password for every find operation, 
     so where i need to access it i have to add it in the select with + so that it comes with other data,
      otherwise it will onkly fetch password data */
 };
+
+UserSchema.statics.isPasswordMatched = async function (
+    plainPassword: string,
+    hashedPassword: string
+  ) {
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  };
 
 export const User = model<IUser, UserModel>("User", UserSchema);
