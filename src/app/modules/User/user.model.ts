@@ -1,14 +1,47 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from "mongoose";
-import { IUser } from "./user.interface";
-import { USER_ROLE } from "./user.constants";
+import { IUser, UserModel } from "./user.interface";
+import { userRole } from "./user.constants";
+import bcrypt from "bcrypt";
+import config from "../../config";
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IUser, UserModel>({
   name: { type: String, required: true },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: { type: String, required: true, select: 0 },
   phone: { type: String, required: true },
-  role: { type: String, enum: USER_ROLE },
+  role: { type: String, enum: userRole },
   address: { type: String, required: true },
 });
 
-export const User = model<IUser>("User", UserSchema);
+UserSchema.pre("save", async function (next) {
+  const user = this; // doc
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+  next();
+});
+
+// post save middleware/ hook : will work on create() and save()
+// UserSchema.post("save", function (doc, next) {
+//     // doc.password = undefined;
+//     delete doc._doc.password; // Remove the password field from the returned object
+
+//   next();
+// });
+
+UserSchema.statics.isUserExists = async function (email: string) {
+  return await User.findOne({ email }).select(
+    "+password"
+  ); /** i have selected 0 for not fetchin the password for every find operation, 
+    so where i need to access it i have to add it in the select with + so that it comes with other data,
+     otherwise it will onkly fetch password data */
+};
+
+export const User = model<IUser, UserModel>("User", UserSchema);
