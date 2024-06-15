@@ -8,4 +8,7 @@ export interface IFacility {
   isDeleted?: boolean;
 }
 
-export interface FacilityModel extends Model<IFacility> {}
+export interface FacilityModel extends Model<IFacility> {
+  isFacilityExists(id: string): Promise<IFacility>;
+  isFacilityExistsByName(email: string): Promise<IFacility>;
+}

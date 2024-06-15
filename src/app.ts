@@ -16,12 +16,15 @@ app.use(cors({ origin: ["http://localhost:5317"] }));
 //application route
 app.use("/api", router);
 
-const test = (req: Request, res: Response) => {
-  Promise.reject();
-};
+// const test = (req: Request, res: Response) => {
+//   Promise.reject();
+// };
 
-app.use("/", test);
+// app.use("/", test);
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("hello world");
+});
 // not found
 app.use(notFound);
 

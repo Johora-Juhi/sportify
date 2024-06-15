@@ -9,23 +9,26 @@ type data<T> = {
   data: T;
 };
 const SendResponse = <T>(res: Response, data: data<T>) => {
-  // res.status(data.statusCode).json({
-  //   success: data.success,
-  //   message: data.message,
-  //   data: data.data,
-  // });
-  const response: Record<string, any> = {
+  res.status(data.statusCode).json({
     success: data.success,
+    statusCode: data.statusCode,
     message: data.message,
-  };
+    token: data.token,
+    data: data.data,
+  });
+  // const response: Record<string, any> = {
+  //   success: data.success,
+  //   statusCode: data.statusCode,
+  //   message: data.message,
+  // };
 
-  if (data.token) {
-    response.token = data.token;
-  }
+  // if (data.token) {
+  //   response.token = data.token;
+  // }
 
-  response.data = data.data;
+  // response.data = data.data;
 
-  res.status(data.statusCode).json(response);
+  // res.status(data.statusCode).json(response);
 };
 
 export default SendResponse;
